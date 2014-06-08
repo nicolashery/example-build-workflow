@@ -1,3 +1,7 @@
+var _ = require('lodash');
+
+var files = require('./files');
+
 module.exports = {
   entry: './src/main.js',
   output: {
@@ -18,8 +22,7 @@ module.exports = {
       {test: /\.json$/, loader: 'json-loader'}
     ]
   },
-  externals: {
-    'react': 'React',
-    'async': 'async'
-  }
+  externals: _.reduce(files.vendor, function(acc, vendor) {
+    return _.assign(acc, vendor.shim);
+  }, {})
 };
