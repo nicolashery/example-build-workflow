@@ -53,14 +53,10 @@ _.forEach(files.vendor, function(vendor) {
 });
 
 var bundlePath = 'dist/bundle.js';
-var minifiedBundlePath = 'dist/bundle.min.js';
-console.log('Running webpack bundler...');
-exec('./node_modules/.bin/webpack --progress --colors');
-console.log('Minifying "' + bundlePath + '"...');
-exec('./node_modules/.bin/uglifyjs ' + bundlePath, {silent:true}).output.to(minifiedBundlePath);
-scriptsToConcatenate.push(minifiedBundlePath);
+console.log('Running webpack bundler with minimize option...');
+exec('./node_modules/.bin/webpack --progress --colors --optimize-minimize');
+scriptsToConcatenate.push(bundlePath);
 tmpFiles.push(bundlePath);
-tmpFiles.push(minifiedBundlePath);
 
 console.log('Concatenating minified scripts...');
 cat(scriptsToConcatenate).to('dist/all-' + pkg.version + '.js');
