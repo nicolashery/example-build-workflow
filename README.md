@@ -16,10 +16,8 @@ In this workflow I tried to focus on three things:
 Tech stack overview:
 
 - [Webpack](http://webpack.github.io/)
-- [Connect](http://www.senchalabs.org/connect/)
 - [ShellJS](http://documentup.com/arturadib/shelljs)
 - [Gulp](http://gulpjs.com/) (only used for JSHint, might be removed)
-- [Bower](http://bower.io/)
 
 ## Quick start
 
@@ -29,7 +27,6 @@ Clone this repository and install dependencies:
 
 ```bash
 $ npm install
-$ bower install
 ```
 
 Source a config file (you can copy and edit `config/sample.sh`) and run the development server:
@@ -39,7 +36,7 @@ $ source config/sample.sh
 $ npm start
 ```
 
-To build a static version of the app ready for deployment, run:
+To build a static version of the app in the `dist/` directory, ready for deployment, run:
 
 ```bash
 $ source config/sample.sh
@@ -52,10 +49,12 @@ You can test the build with:
 $ npm run server
 ```
 
-While developing, in a separate terminal you can watch files and run JSHint on changes:
+Run JSHint with:
 
 ```bash
 $ npm run jshint
+# or you can watch files and re-run on changes with:
+$ npm run jshint-watch
 ```
 
 ## Webpack bundler
@@ -70,57 +69,37 @@ As you saw in the "quick start", I use the `scripts` attribute in `package.json`
 
 It's nice to have a single place to run commands. It also means that I can change the underlying script or command without needing to remember a new thing to type into the terminal.
 
-## Code versus configuration
+## Start developing with a single command
 
-I prefer tools that allow me to work in a `.js` file (vs. a `.json` configuration file for example).
+For development, one thing that's important to me is that you can start coding by having just one command to type in a terminal: `npm start`.
 
-It's a lot more flexible. You can set values on run-time, for example `var version = require('./package.json').version` or `var foo = process.env.FOO`. I also use it to put all the info for vendor files in a single place, `files.js` and import it in different scripts.
+Some workflows require you to have one terminal running a "watch & rebuild" task, and another terminal running a server, I prefer having just one command and one terminal if I can. I also like the idea of not having any temporary files being saved in my project folder, i.e. having everything built in-memory.
 
-## develop.js
+With Webpack I can use the [webpack-dev-server](http://webpack.github.io/docs/webpack-dev-server.html), which does all of that for me.
 
-For development, one thing that's important to me is that you can start coding by having just one command to type in a terminal: `npm start` (runs `node develop.js`).
+The Webpack dev server also has caching and incremental builds, which is important for performance: after the first build, it's only rebuilding the files that changed, making the requests to the server faster. (Browserify also has incremental builds with [watchify](https://github.com/substack/watchify), but that will only work on JS files).
 
-A lot of workflows require you to have one terminal running a "watch & rebuild" task, and another terminal running a server. Even that feels too much for me. I also like the idea of not having any temporary files being saved in my project folder, having everything built in-memory.
-
-The `develop.js` is simply a [Connect](http://www.senchalabs.org/connect/) server, which Webpack integrates nicely to, thanks to its [webpack-dev-middleware](http://webpack.github.io/docs/webpack-dev-middleware.html).
-
-The Webpack middleware also has caching and incremental builds, which is important for performance: after the first build, it's only rebuilding the files that changed, making the requests to the server faster. (Browserify also has incremental builds with [watchify](https://github.com/substack/watchify), but that's only on the command-line and to my knowledge you can't integrate it in a Connect server).
-
-## build.js
+## Cross-platform Bash scripts
 
 As I said before, there are a lot of build tools out there ([Grunt](http://gruntjs.com/), [Gulp](http://gulpjs.com/), [Broccoli](https://github.com/broccolijs/broccoli) to state some popular ones).
 
-Lately I found that if the build is simple enough, I like to use [ShellJS](http://documentup.com/arturadib/shelljs). A lot of developers are used to working with UNIX commands like `cat`, `rm`, `mkdir`, etc., so there's nothing really new to learn. It's like a `bash` script, except it's cross-platform. You can even create a script that has the structure of a `Makefile` if you want to.
+Lately I found that if the build is simple enough (note that Webpack takes care of most of the build anyway), I like to use [ShellJS](http://documentup.com/arturadib/shelljs). A lot of developers are used to working with UNIX commands like `cat`, `rm`, `mkdir`, etc., so there's nothing really new to learn. It's like a `bash` script, except it's cross-platform. You can even create a script that has the structure of a `Makefile` if you want to.
 
 In terms of speed (Gulp aims to be fast, thanks to its use of streams), I haven't had any problems with it. I find that for a fresh build, the `npm install` part is usually what takes the longest.
 
-## server.js
+## Static server
 
-I use this script to test the static production build. Don't expect people to have static servers ready, or to remember the command `python -m SimpleHTTPServer`. Have it all available for them. :)
+I include [http-server](https://github.com/nodeapps/http-server) to test the static production build. Don't expect people to have static servers ready, or to remember the command `python -m SimpleHTTPServer`. It's nice to have it all available for them. :)
 
-## Vendor libraries
+## Embracing CommonJS and npm
 
-Webpack has good support for all kind of modules systems (AMD, CommonJS, etc.) but I decided to just stick with `window` globals. For now, I know it's the one common thing among all front-end library authors. Almost everyone provides a "distribution" version: a single prepackaged file that might use [UMD](https://github.com/umdjs/umd), but at the very least exports on the `window` object.
+On the front-end, there are all kinds of module systems (AMD, CommonJS, ES6 modules, etc.), and "package managers" (Bower, Component, npm, etc.).
 
-By doing it this way, I also see a performance boost in the development and build scripts. Webpack doesn't need to worry about those files, it just focuses on my app. And if the vendor provides a minified version, I use that in the build step so I don't need to minify it myself (which can take a bit of time and is resource intensive).
+Recently I've tried to just stick with CommonJS (`var foo = require('foo')`), and npm. It's really just a matter of taste and trying to keep it simple. What's nice about Webpack is that it can support a lot of different systems, so one could adapt it easily to a different convention.
 
-Of course, if I split my app into multiple smaller repositories, I won't pre-build the bundles for each repo. I'll use them directly with Webpack, but that's because I've established this "internal convention" for my project.
+## Config with environment variables
 
-## Bower
-
-I've read that some people are not a fan of [Bower](http://bower.io/). The main reason seems to be that npm has already solved package management, so it's not solving anything new. It also feels weird to use a package manager (npm), to install another package manager (Bower).
-
-I'd like to use "npm for all the things", and I've tried. However, since I'm using prepackaged distribution files exporting on the `window` object, I've found that these were not always available on npm. Bower being browser-focused, I'm sure to always get a prepackaged bundle.
-
-I also like the fact that Bower installs a "flat" dependency tree. If one library says it needs jQuery 1.7.1 and the other jQuery 1.7.2 I don't want both. Unlike on the server-side with Node, you have to be careful of the number of bytes sent down the wire to the browser. You also need to watch out for conflicts with exposing on the `window` object. My projects so far never had enough vendor libraries to reach "dependency hell" doing it this way.
-
-The last thing I like about Bower is its flexibility: all you need to make a Bower "package" is a GitHub repo with tags. So to me, Bower is really more of a "downloader" with version support than a "package manager".
-
-## Lo-Dash templates and environment variables
-
-Two files, `index.html` and `config.js`, are actually [Lo-Dash](http://lodash.com/) templates. This allows me to generate different versions of them for different environments (ex: development, staging, production).
-
-It also means I can use environment variables (ex: `export API_URL='http://staging-api.example.com'`) to create a `window.config` object for the web app to use, somewhat mimicking the process of configuring a server-side Node.js app. (Of course, don't store anything secret in that config object, since unlike the server-side case, it is available for anyone to see.)
+Webpack has support for [envify](https://github.com/hughsk/envify), which replaces `process.env.ENV_VAR` with the value of the environment variable `ENV_VAR`. I use this to pass configuration values to the web app when building it (ex: `export API_URL='http://staging-api.example.com'`), somewhat mimicking the process of configuring a server-side Node.js app. (Of course, don't store anything secret in that config object, since unlike the server-side case, it is available for anyone to see.)
 
 ## JSHint
 
@@ -144,4 +123,4 @@ I've used it once, but I found that I was not hitting "Save" after making some c
 
 I'd much rather do some coding, save files often, and choose when I want the browser to refresh and show me my changes. I haven't yet felt the feedback loop to be too slow that way.
 
-LiveReload is nice when you're working on CSS only though.
+LiveReload is nice when you're working on the CSS though.
