@@ -2,10 +2,6 @@
 .DS_Store
 Desktop.ini
 
-# Files used by IntelliJ
-*.iml
-.idea
-
 # Thumbnail cache files
 ._*
 Thumbs.db
@@ -17,7 +13,6 @@ Thumbs.db
 # Application specific files
 node_modules
 npm-debug.log
-bower_components
 tmp
 dist
 config/*

@@ -5,11 +5,9 @@ var jshint = require('gulp-jshint');
 var jsFiles = [
   'src/**/*.js',
   'build.js',
-  'develop.js',
-  'files.js',
   'gulpfile.js',
-  'server.js',
-  'webpack.config.js'
+  'webpack.config.js',
+  'webpack.config.prod.js'
 ];
 
 gulp.task('jshint', function(cb) {

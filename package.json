@@ -1,37 +1,38 @@
 {
   "name": "example-build-workflow",
   "version": "0.1.0",
-  "dependencies": {},
+  "dependencies": {
+    "async": "^0.9.0",
+    "react": "^0.11.1"
+  },
   "devDependencies": {
-    "connect": "^2.14.3",
-    "css-loader": "^0.6.12",
+    "css-loader": "^0.7.0",
+    "envify-loader": "^0.1.0",
     "file-loader": "^0.5.1",
     "gulp": "^3.6.2",
     "gulp-jshint": "^1.6.1",
-    "gulp-react": "^0.3.3",
-    "jshint-stylish": "^0.2.0",
+    "gulp-react": "^0.5.0",
+    "http-server": "^0.6.1",
+    "jshint-stylish": "^0.4.0",
     "json-loader": "^0.5.0",
-    "jsx-loader": "^0.10.1",
+    "jsx-loader": "^0.11.0",
     "less-loader": "^0.7.2",
-    "lodash": "^2.4.1",
-    "send": "^0.3.0",
-    "serve-static": "^1.2.0",
     "shelljs": "^0.3.0",
     "style-loader": "^0.6.3",
-    "uglify-js": "^2.4.13",
     "url-loader": "^0.5.5",
     "webpack": "^1.1.8",
-    "webpack-dev-middleware": "^1.0.5"
+    "webpack-dev-server": "^1.4.7"
   },
   "engines": {
     "node": "0.10.x"
   },
   "private": true,
   "scripts": {
-    "start": "node develop",
-    "develop": "node develop",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --devtool source-map --cache --colors --progress",
     "build": "node build",
-    "server": "node server",
-    "jshint": "gulp jshint-watch"
+    "server": "http-server ./dist",
+    "jshint": "gulp jshint",
+    "jshint-watch": "gulp jshint-watch"
   }
 }
