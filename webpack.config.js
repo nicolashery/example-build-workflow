@@ -8,7 +8,6 @@ module.exports = {
   },
   module: {
     loaders: [
-      {test: /\.js$/, loader: 'jsx-loader'},
       {test: /\.js$/, loader: 'jsx-loader!envify-loader'},
       {test: /\.less$/, loader: 'style-loader!css-loader!less-loader'},
       {test: /\.gif/, loader: 'url-loader?limit=10000&mimetype=image/gif'},
